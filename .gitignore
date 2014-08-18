@@ -6,6 +6,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+.env/
 .Python
 env/
 bin/
@@ -52,3 +53,4 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+*.priv.py

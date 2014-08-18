@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Profile Page</h2>
+    <p>Hello
+        {{ current_user.username or current_user.email }},</p>
+    <p> <a href="{{ url_for('user.change_username') }}">
+        Change username</a></p>
+    <p> <a href="{{ url_for('user.change_password') }}">
+        Change password</a></p>
+    <p> <a href="{{ url_for('user.logout') }}?next={{ url_for('user.login') }}">
+        Sign out</a></p>
+{% endblock %}
