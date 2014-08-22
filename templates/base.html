@@ -8,7 +8,17 @@
 </head>
 <body>
 <div class="container">
-<!-- child template -->
+	{% if current_user.is_authenticated() %}
+    <p>
+    	<span>{{ current_user.email }}</span>
+    	<span> <a href="{{ url_for('send_notifications')}}">Send notification</a></span>
+    	<span> <a href="{{ url_for('subscriptions_page') }}">Channels</a></span>
+    	<span> <a href="{{ url_for('user.change_password') }}">
+        	Change password</a></span>
+    	<span> <a href="{{ url_for('user.logout') }}?next={{ url_for('user.login') }}">
+        	Sign out</a></span>
+    </p>
+    {% endif %}
 {% block content %}{% endblock %}
 <!-- errors -->
 {% if error %}

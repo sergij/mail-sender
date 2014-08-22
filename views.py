@@ -1,7 +1,7 @@
 
 from __future__ import unicode_literals
 
-from flask import url_for, redirect, render_template
+from flask import url_for, redirect, render_template, request
 from flask.ext.mail import Message
 from flask.ext.user import current_user, login_required
 
@@ -13,10 +13,13 @@ from models import db, User, SubscriberAssociation
 @app.route('/subscriptions')
 @login_required
 def subscriptions_page():
-    other_channels = User.query.filter(db.not_(User.id.in_(
-        [o.author_id for o in current_user.subscriptions]))).all()
     subscriptions = User.query.filter(User.id.in_(
         [o.author_id for o in current_user.subscriptions])).all()
+    show_all = request.args.get('subscriptions', '') != '1'
+    other_channels = (
+        User.query.filter(db.not_(User.id.in_(
+            [o.author_id for o in current_user.subscriptions]))).all()
+        if show_all else [])
     return render_template(
         'subscriptions.html',
         subscriptions=subscriptions,
@@ -31,23 +34,24 @@ def home_page():
         return redirect(url_for('user.login'))
 
 
-@app.route('/subscribe/<channel_id>', methods=['POST'])
+@app.route('/subscribe/<channel_id>', methods=['GET'])
 @login_required
 def subscribe(channel_id):
     if not db.session.query(db.exists().where(User.id == channel_id)).scalar():
-        return {'success': False}
+        return redirect(request.referrer)
     new_subscribe = SubscriberAssociation(author_id=channel_id, subscriber_id=current_user.id)
     db.session.add(new_subscribe)
     db.session.commit()
-    return {'success': True}
+    return redirect(request.referrer)
 
 
-@app.route('/unsubscribe/<channel_id>', methods=['POST'])
+@app.route('/unsubscribe/<channel_id>', methods=['GET'])
 @login_required
 def unsubscribe(channel_id):
     SubscriberAssociation.query.filter_by(
         author_id=channel_id, subscriber_id=current_user.id).delete()
-    return {'success': True}
+    db.session.commit()
+    return redirect(request.referrer)
 
 
 def send_mails(message, recipients):
@@ -61,11 +65,11 @@ def send_mails(message, recipients):
             conn.send(msg)
 
 
-@app.route('/send-notifications', methods=['POST'])
+@app.route('/send-notifications', methods=['POST', 'GET'])
 @login_required
 def send_notifications():
     form = ContactForm()
     if form.validate_on_submit():
         recipients = [o.subscriber for o in current_user.subscribers]
-        send_mails(form.message, recipients)
+        send_mails(form.message.data, recipients)
     return render_template('send-notifications.html', form=form)

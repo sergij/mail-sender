@@ -1,19 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
     <p>
-    	<span>{{ current_user.email }}</span>
-    	<span> <a href="{{ url_for('user.change_password') }}">
-        	Change password</a></span>
-    	<span> <a href="{{ url_for('user.logout') }}?next={{ url_for('user.login') }}">
-        	Sign out</a></span>
+    	<span> <a href="{{ url_for('subscriptions_page') }}">
+        	List of channels</a></span>
+    	<span> <a href="{{ url_for('subscriptions_page', subscriptions=1) }}">
+        	My subscriptions</a></span>
     </p>
     <h2>All channels:</h2>
+    {% if not subscriptions %}
+        <strong>You have no subscriptions</strong> <br>
+        <br>
+    {% endif %}
 	{% for channel in subscriptions %}
-  		<strong>Title:</strong> {{ channel.channel_title }} <br>
+  		<strong>Title:</strong> {{ channel.channel_title }} 
+        <span><a href="{{ url_for('unsubscribe', channel_id=channel.id) }}"> Unsubscribe</a></span>
+        <br>
 	<br>
 	{% endfor %}
 	{% for channel in other_channels %}
-  		<strong>Title:</strong> {{ channel.channel_title }} <br>
+  		<strong>Title:</strong> {{ channel.channel_title }} 
+        <span><a href="{{ url_for('subscribe', channel_id=channel.id) }}"> Subscribe</a></span>
+        <br>
 	<br>
 	{% endfor %}
 {% endblock %}

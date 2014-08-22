@@ -14,10 +14,11 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 babel = Babel(app)
 mail = Mail(app)
 from models import db, User
+from forms import ExtendedRegisterForm
 
 db.init_app(app)
 db_adapter = SQLAlchemyAdapter(db, User)
-UserManager(db_adapter, app)
+user_manager = UserManager(db_adapter, app, register_form=ExtendedRegisterForm)
 from views import *
 
 if __name__ == '__main__':

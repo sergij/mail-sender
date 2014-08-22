@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
-from wtforms import Form, TextAreaField, SubmitField, validators, TextField
-from flask.ext.security.forms import RegisterForm
+from flask.ext.wtf import Form
+from wtforms import TextAreaField, SubmitField, validators, TextField
+from flask.ext.user.forms import RegisterForm
 
 
 class ExtendedRegisterForm(RegisterForm):
-    chanel_title = TextField('Channel title', [validators.Required()])
+    channel_title = TextField('Channel title', [validators.Required()])
 
 
 class ContactForm(Form):
